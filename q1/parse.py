@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-# Student name: NAME
-# Student number: NUMBER
-# UTORid: ID
+# Student name: Haolin Fan
+# Student number: 1003364316
+# UTORid: fanhaoli
 """Functions and classes that handle parsing"""
 
 from itertools import chain
@@ -61,6 +61,7 @@ class PartialParse(object):
         Assume that the PartialParse is valid
         """
         # *#* BEGIN YOUR CODE *#* #
+        return self.next >= len(self.sentence) and len(self.stack) == 1
         # *** END YOUR CODE *** #
 
     def parse_step(self, transition_id, deprel=None):
@@ -82,6 +83,17 @@ class PartialParse(object):
                 given the current state
         """
         # *#* BEGIN YOUR CODE *#* #
+        if transition_id == self.left_arc_id:
+            self.arcs.append((self.stack[len(self.stack) - 1], self.stack[len(self.stack) - 2], deprel))
+            self.stack.pop(len(self.stack) - 2)
+
+        if transition_id == self.right_arc_id:
+            self.arcs.append((self.stack[len(self.stack) - 2], self.stack[len(self.stack) - 1], deprel))
+            self.stack.pop()
+
+        if transition_id == self.shift_id:
+            self.stack.append(self.next)
+            self.next += 1
         # *** END YOUR CODE *** #
 
     def get_n_leftmost_deps(self, sentence_idx, n=None):
@@ -104,6 +116,17 @@ class PartialParse(object):
                 1, etc.
         """
         # *#* BEGIN YOUR CODE *#* #
+        deps = []
+        i = 0
+        j = 0
+        while i < len(self.arcs) and (n is None or j < n):
+            arc = self.arcs[i]
+            arc_head = arc[0]
+            if arc_head == sentence_idx:
+                arc_dep = arc[1]
+                deps.append(arc_dep)
+                j += 1
+            i += 1
         # *** END YOUR CODE *** #
         return deps
 
@@ -127,6 +150,17 @@ class PartialParse(object):
                 1, etc.
         """
         # *#* BEGIN YOUR CODE *#* #
+        deps = []
+        i = len(self.arcs) - 1
+        j = 0
+        while i >= 0 and (n is None or j < n):
+            arc = self.arcs[i]
+            arc_head = arc[0]
+            if arc_head == sentence_idx:
+                arc_dep = arc[1]
+                deps.append(arc_dep)
+                j += 1
+            i -= 1
         # *** END YOUR CODE *** #
         return deps
 
@@ -235,6 +269,21 @@ def minibatch_parse(sentences, model, batch_size):
             arcs[i] should contain the arcs for sentences[i]).
     """
     # *#* BEGIN YOUR CODE *#* #
+    partial_parses = [PartialParse(sentence) for sentence in sentences]
+    unfinished_parses = partial_parses.copy()
+
+    while len(unfinished_parses) > 0:
+        minibatch = unfinished_parses[0: batch_size]
+        td_pairs = model.predict(minibatch) # TODO: not optimal to remove from front but must maintain order
+
+        i = 0
+        for unfinished_parse in list(minibatch):
+            unfinished_parse.parse_step(td_pairs[i][0], td_pairs[i][1])  # TODO: test if this actually changes original PPs
+            if unfinished_parse.complete:
+                unfinished_parses.pop(i)  # TODO: removing from front
+            i += 1
+
+    arcs = [partial_parse.arcs for partial_parse in partial_parses]
     # *** END YOUR CODE *** #
     return arcs
 
