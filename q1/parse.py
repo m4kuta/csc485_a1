@@ -218,6 +218,22 @@ class PartialParse(object):
             raise ValueError('PartialParse already completed')
         transition, deprel_label = -1, None
         # *#* BEGIN YOUR CODE *#* #
+        top = self.stack[-1]
+        if top == 0 and not self.complete:
+            return self.shift_id, None
+
+        left = self.stack[-2]
+
+        if get_head(left, graph) == top:
+            return self.left_arc_id, get_deprel(left, graph)
+
+        if get_head(top, graph) == left:
+            for dep in get_deps(top, graph):
+                if dep >= self.next:
+                    return self.shift_id, None
+            return self.right_arc_id, get_deprel(top, graph)
+
+        transition, deprel_label, = self.shift_id, None
         # *** END YOUR CODE *** #
         return transition, deprel_label
 

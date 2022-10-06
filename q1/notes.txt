@@ -1,0 +1,27 @@
+﻿top = top word in stack
+left = second top word in stack
+
+if top related to left
+    if left is root
+        if words still in buffer
+            shift
+    elif top is head of left
+        left arc, get dep's dep label
+    elif top is dep of left
+        if top has dep to the right
+            shift
+        else
+            right arc, get top's dep label
+else
+    shift
+
+
+mirror of this?
+if top has dependency to the right
+            shift
+
+
+NVM actually alwayse choose left arc over shift
+choosing shift over left-arc?
+    if top is head of left
+        if top has a head to the right,
