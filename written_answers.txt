@@ -3,3 +3,11 @@ In 2n steps. Over the entire parse, n steps would be spent adding each word to t
 
 Q2(a)
 A non-projective dependency tree has a gap degree > 0, i.e. some words in the input text will have a gap degree > 0 meaning other words will be dependent on those gap words or vice versa. Those dependencies must cross the dependencies the subsequence of the given word.
+
+Non-projective dependency trees represent inputs with long-distance dependencies and free word order. These structural characteristics
+
+Given a non-project tree, we know there exists a head word at index i with a gap degree > 0. This means an arc exists between i and one of its dependent words at index j and there also exists a word at index k, where min(i, j) < k < max(i, j), that is not dependent on i. We know a path must exist from the root to k so k must be connected to some word at an index < min(i, j) and/or > max(i, j). In that case a path from that word to k must cross the arc between i and j as this arc encompasses k.
+
+We know this because if k is the head of i, k, none of the other words between i and j can be the head of k because that would create a cycle. And k cannot be the dependent of any word between i and j because then it would not be a gap word.
+
+The original algorithm does not support arcs crossing each other. More specifically it does not support a word having multiple dependents in the same direction and a word existing in between those that is not a dependent of the given word. In that scenario it would have to shift all of a given heads n >= 2 dependents onto the stack before applying left or right arcs but at that point, the index of the head is already more than two places below the top of the stack.

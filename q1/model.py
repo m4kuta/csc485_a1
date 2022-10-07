@@ -137,7 +137,6 @@ class ParserModel(nn.Module):
            embedded_batch.reshape(...) methods if you prefer.
         """
         # *#* BEGIN YOUR CODE *#* #
-        N = self.config.n_word_features + self.config.n_tag_features + self.config.n_deprel_features
         reshaped_batch = torch.reshape(embedded_batch, (self.config.batch_size, -1)) # TODO: double check correct shape
         # *** END YOUR CODE *** #
         return reshaped_batch
@@ -177,7 +176,7 @@ class ParserModel(nn.Module):
         # *#* BEGIN YOUR CODE *#* #
         x = torch.cat((self.reshape_embedded(self.word_embed(word_id_batch)),
                        self.reshape_embedded(self.tag_embed(tag_id_batch)),
-                       self.reshape_embedded(self.deprel_embed(deprel_id_batch))))
+                       self.reshape_embedded(self.deprel_embed(deprel_id_batch))), 1)
         # *** END YOUR CODE *** #
         return x
 
@@ -258,6 +257,7 @@ class ParserModel(nn.Module):
             loss: A 0d tensor (scalar) of dtype float
         """
         # *#* BEGIN YOUR CODE *#* #
+        loss = F.cross_entropy(prediction_batch, class_batch)
         # *** END YOUR CODE *** #
         return loss
 
