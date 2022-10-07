@@ -41,21 +41,23 @@ def is_projective(heads: T.Iterable[int]) -> bool:
         head = heads_list[heads_index]
         curr = heads_index + 1
 
-        if head > curr:
-            left, right = curr + 1, head - 1
-        else:
-            left, right = head + 1, curr
+        left = min(head, curr)
+        right = max(head, curr)
 
-        left = min (curr + 1, head + 1)
-        right = min ()
-        for word in range(left, right): # range in heads_list
-            parent = heads_list[word - 1]
-            while parent != 0:
-                if parent == head:
-                    break
-                if parent < min(head, curr) or parent > max(head, curr) curr:
-                    return False
-                parent = heads_list[parent - 1]
+        # for word in range(left + 1, right): # range in heads_list
+        #     parent = heads_list[word - 1]
+        #     while parent != 0:
+        #         if parent == head:
+        #             break
+        #         if parent < left or parent > right:
+        #             return False
+        #         parent = heads_list[parent - 1]
+
+        # for word in between left and right
+        for word in range(left + 1, right):
+            word_head = heads_list[word - 1]
+            if word_head < left or word_head > right:
+                return False
     # *** END YOUR CODE *** #
     return projective
 
