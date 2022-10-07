@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-# Student name: NAME
-# Student number: NUMBER
-# UTORid: ID
+# Student name: Haolin Fan
+# Student number: 1003364316
+# UTORid: fanhaoli
 """Statistical modelling/parsing classes"""
 
 from itertools import islice
@@ -73,6 +73,9 @@ class ParserModel(nn.Module):
            (Don't use different variable names!)
         """
         # *#* BEGIN YOUR CODE *#* #
+        self.word_embed = nn.Embedding.from_pretrained(word_embeddings, False)
+        self.tag_embed = nn.Embedding(self.config.n_tag_ids, self.config.n_tag_features)
+        self.deprel_embed = nn.Embedding(self.config.n_deprel_ids, self.config.n_deprel_features)
         # *** END YOUR CODE *** #
 
     def create_net_layers(self) -> None:
@@ -103,6 +106,9 @@ class ParserModel(nn.Module):
         tensors automatically, so that's all that is to be done here.
         """
         # *#* BEGIN YOUR CODE *#* #
+        N = self.config.n_word_features + self.config.n_tag_features + self.config.n_deprel_features
+        self.hidden_layer = nn.Linear(N * self.config.embed_size, self.config.hidden_size)
+        self.output_layer = nn.Linear(N * self.config.embed_size, self.config.n_classes)
         # *** END YOUR CODE *** #
 
     def reshape_embedded(self, embedded_batch: torch.Tensor) -> torch.Tensor:
@@ -131,6 +137,8 @@ class ParserModel(nn.Module):
            embedded_batch.reshape(...) methods if you prefer.
         """
         # *#* BEGIN YOUR CODE *#* #
+        N = self.config.n_word_features + self.config.n_tag_features + self.config.n_deprel_features
+        reshaped_batch = torch.reshape(embedded_batch, (self.config.batch_size, -1)) # TODO: double check correct shape
         # *** END YOUR CODE *** #
         return reshaped_batch
 
@@ -167,6 +175,9 @@ class ParserModel(nn.Module):
            get the necessary shape specified above and return the result.
         """
         # *#* BEGIN YOUR CODE *#* #
+        x = torch.cat((self.reshape_embedded(self.word_embed(word_id_batch)),
+                       self.reshape_embedded(self.tag_embed(tag_id_batch)),
+                       self.reshape_embedded(self.deprel_embed(deprel_id_batch))))
         # *** END YOUR CODE *** #
         return x
 
@@ -216,6 +227,9 @@ class ParserModel(nn.Module):
                                        torch.tensor(deprel_id_batch))
 
         # *#* BEGIN YOUR CODE *#* #
+        h = F.relu(self.hidden_layer(x))
+        h_drop = F.dropout(h, self.config.dropout, self.training)
+        pred = self.output_layer(h_drop)
         # *** END YOUR CODE *** #
         return pred
 

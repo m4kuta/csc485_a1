@@ -1,0 +1,5 @@
+﻿Q1(b)
+In 2n steps. Over the entire parse, n steps would be spent adding each word to the stack from the buffer at some point and another n steps would be spent removing each word out of the stack at some point.
+
+Q2(a)
+A non-projective dependency tree has a gap degree > 0, i.e. some words in the input text will have a gap degree > 0 meaning other words will be dependent on those gap words or vice versa. Those dependencies must cross the dependencies the subsequence of the given word.

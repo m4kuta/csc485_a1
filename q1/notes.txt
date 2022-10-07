@@ -1,4 +1,14 @@
-﻿top = top word in stack
+﻿Q1e)
+
+At each step (transition), get the correct transition from the oracle
+
+Oracle takes a give partial parse state and a set of correct target arcs
+
+Oracle returns correct next transition to take at current state
+
+Arc transitions must be correctly labelled
+
+top = top word in stack
 left = second top word in stack
 
 if top related to left
@@ -25,3 +35,39 @@ NVM actually alwayse choose left arc over shift
 choosing shift over left-arc?
     if top is head of left
         if top has a head to the right,
+
+
+Q1e)
+Model extracts a feature vector representing current state
+    Already implemented
+
+Feature vector contains list of tokens (specific words)
+Represented as a list of ints [w_1, ... w_m]
+w_i is the index of a token in the input vocab V
+    0 <= w_i < |V|
+    m is number of features
+
+Network uses pre-trained word embeddings (word vectors)
+    Each word embedding are matrices, L_{w_i}
+Network looks up embedding (vector) for each word
+Concatenate all embeddings into a single input vector, x_w
+Vector is one big matrix where each row L_i is the vector (embedding) for word i
+
+Emeddings for tags, x_t
+Embeddings for arc-lables, x_l
+
+Concat all three vectors into vector x
+
+Computer prediction probabilities using two functions
+ReLU function: h = max(xW_h + b_h, 0), h(z) = ReLU(z) = max(z, 0)
+y-hat = softmax(hW_0 + b_0)
+
+Objective function, cross entropy loss
+J(theta) = CE(y, y-hat) = -sum(i = 1 to N_c, y_i log(y-hat_i))
+Minimize this value
+
+To compute loss for a training set, average J(theta) across all training examples
+
+
+
+
