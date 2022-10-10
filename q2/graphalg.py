@@ -36,29 +36,6 @@ def is_projective(heads: T.Iterable[int]) -> bool:
     """
     projective = True
     # *#* BEGIN YOUR CODE *#* #
-    # heads_list = list(heads)
-    # for heads_index in range(len(heads_list)):
-    #     head = heads_list[heads_index]
-    #     curr = heads_index + 1
-    #
-    #     left = min(head, curr)
-    #     right = max(head, curr)
-    #
-    #     # for word in range(left + 1, right): # range in heads_list
-    #     #     parent = heads_list[word - 1]
-    #     #     while parent != 0:
-    #     #         if parent == head:
-    #     #             break
-    #     #         if parent < left or parent > right:
-    #     #             return False
-    #     #         parent = heads_list[parent - 1]
-    #
-    #     # for word in between left and right
-    #     for word in range(left + 1, right):
-    #         word_head = heads_list[word - 1]
-    #         if word_head < left or word_head > right:
-    #             return False
-
     heads_list = list(heads)
     for heads_index, curr_head in enumerate(heads_list):
         curr = heads_index + 1

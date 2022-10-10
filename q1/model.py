@@ -108,7 +108,7 @@ class ParserModel(nn.Module):
         # *#* BEGIN YOUR CODE *#* #
         N = self.config.n_word_features + self.config.n_tag_features + self.config.n_deprel_features
         self.hidden_layer = nn.Linear(N * self.config.embed_size, self.config.hidden_size)
-        self.output_layer = nn.Linear(N * self.config.embed_size, self.config.n_classes)
+        self.output_layer = nn.Linear(self.config.hidden_size, self.config.n_classes)
         # *** END YOUR CODE *** #
 
     def reshape_embedded(self, embedded_batch: torch.Tensor) -> torch.Tensor:
@@ -137,7 +137,7 @@ class ParserModel(nn.Module):
            embedded_batch.reshape(...) methods if you prefer.
         """
         # *#* BEGIN YOUR CODE *#* #
-        reshaped_batch = torch.reshape(embedded_batch, (self.config.batch_size, -1)) # TODO: double check correct shape
+        reshaped_batch = torch.reshape(embedded_batch, (embedded_batch.size(0), -1))
         # *** END YOUR CODE *** #
         return reshaped_batch
 
