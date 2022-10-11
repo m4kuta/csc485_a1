@@ -84,16 +84,25 @@ class PartialParse(object):
         """
         # *#* BEGIN YOUR CODE *#* #
         if transition_id == self.left_arc_id:
+            if (len(self.stack)) < 2:
+                raise ValueError("Illegal transition")
             self.arcs.append((self.stack[len(self.stack) - 1], self.stack[len(self.stack) - 2], deprel))
             self.stack.pop(len(self.stack) - 2)
 
-        if transition_id == self.right_arc_id:
+        elif transition_id == self.right_arc_id:
+            if (len(self.stack)) < 2:
+                raise ValueError("Illegal transition")
             self.arcs.append((self.stack[len(self.stack) - 2], self.stack[len(self.stack) - 1], deprel))
             self.stack.pop()
 
-        if transition_id == self.shift_id:
+        elif transition_id == self.shift_id:
+            if self.next >= len(self.sentence):
+                raise ValueError("Illegal transition")
             self.stack.append(self.next)
             self.next += 1
+
+        else:
+            raise ValueError("Invalid transition_id")
         # *** END YOUR CODE *** #
 
     def get_n_leftmost_deps(self, sentence_idx, n=None):
@@ -290,14 +299,16 @@ def minibatch_parse(sentences, model, batch_size):
 
     while len(unfinished_parses) > 0:
         minibatch = unfinished_parses[0: batch_size]
-        td_pairs = model.predict(minibatch) # TODO: not optimal to remove from front but must maintain order
+        td_pairs = model.predict(minibatch)
 
-        i = 0
-        for unfinished_parse in list(minibatch):
-            unfinished_parse.parse_step(td_pairs[i][0], td_pairs[i][1])  # TODO: test if this actually changes original PPs
+        for i, unfinished_parse in enumerate(minibatch):
+            try:
+                unfinished_parse.parse_step(td_pairs[i][0], td_pairs[i][1])
+            except ValueError as e:
+                unfinished_parses.remove(unfinished_parse)
+
             if unfinished_parse.complete:
-                unfinished_parses.pop(i)  # TODO: removing from front
-            i += 1
+                unfinished_parses.remove(unfinished_parse)
 
     arcs = [partial_parse.arcs for partial_parse in partial_parses]
     # *** END YOUR CODE *** #

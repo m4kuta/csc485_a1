@@ -68,6 +68,8 @@ Minimize this value
 
 To compute loss for a training set, average J(theta) across all training examples
 
+q1f)
+
 
 
 

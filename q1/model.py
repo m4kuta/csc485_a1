@@ -74,8 +74,8 @@ class ParserModel(nn.Module):
         """
         # *#* BEGIN YOUR CODE *#* #
         self.word_embed = nn.Embedding.from_pretrained(word_embeddings, False)
-        self.tag_embed = nn.Embedding(self.config.n_tag_ids, self.config.n_tag_features)
-        self.deprel_embed = nn.Embedding(self.config.n_deprel_ids, self.config.n_deprel_features)
+        self.tag_embed = nn.Embedding(self.config.n_tag_ids, self.config.embed_size)
+        self.deprel_embed = nn.Embedding(self.config.n_deprel_ids, self.config.embed_size)
         # *** END YOUR CODE *** #
 
     def create_net_layers(self) -> None:
