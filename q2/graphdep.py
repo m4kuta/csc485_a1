@@ -118,6 +118,20 @@ class GraphDepModel(nn.Module):
             None
         """
         # *#* BEGIN YOUR CODE *#* #
+        # TODO: Do we need a second Linear for output layer?
+        mlp = nn.Sequential(
+            nn.Linear(self.pt_width, cfg.ARC_DIM),
+            nn.Linear(cfg.ARC_DIM, cfg.ARC_DIM),
+            nn.ReLU(),
+            nn.Dropout(cfg.DROPOUT, True))
+        self.arc_h_mlp = mlp
+        self.arc_d_mlp = mlp
+        self.arc_W = nn.Parameter(torch.randint(
+            ((3 / cfg.ARC_DIM) ** 0.5) * -1, (3 / cfg.ARC_DIM) ** 0.5,
+            (cfg.ARC_DIM, self.pt_width)))
+        self.arc_B = nn.Parameter(torch.randint(
+            ((3 / cfg.ARC_DIM) ** 0.5) * -1, (3 / cfg.ARC_DIM) ** 0.5,
+            (cfg.ARC_DIM, 1)))
         # *** END YOUR CODE *** #
 
     def score_arcs(self, arc_head: Tensor, arc_dep: Tensor) -> Tensor:
@@ -154,6 +168,9 @@ class GraphDepModel(nn.Module):
             assignment handout.
         """
         # *#* BEGIN YOUR CODE *#* #
+        # TODO: use matmul, unsqueeze
+        arc_scores = torch.einsum('bij, bjk -> bik', torch.matmul(arc_dep, self.arc_W), arc_head) +\
+                     torch.matmul(arc_head, self.arc_B)
         # *** END YOUR CODE *** #
         return arc_scores
 
