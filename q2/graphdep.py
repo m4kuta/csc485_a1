@@ -128,10 +128,10 @@ class GraphDepModel(nn.Module):
         self.arc_d_mlp = mlp
         self.arc_W = nn.Parameter(torch.randint(
             ((3 / cfg.ARC_DIM) ** 0.5) * -1, (3 / cfg.ARC_DIM) ** 0.5,
-            (cfg.ARC_DIM, self.pt_width)))
+            (cfg.ARC_DIM, cfg.ARC_DIM)))
         self.arc_B = nn.Parameter(torch.randint(
             ((3 / cfg.ARC_DIM) ** 0.5) * -1, (3 / cfg.ARC_DIM) ** 0.5,
-            (cfg.ARC_DIM, 1)))
+            cfg.ARC_DIM))
         # *** END YOUR CODE *** #
 
     def score_arcs(self, arc_head: Tensor, arc_dep: Tensor) -> Tensor:
@@ -168,9 +168,8 @@ class GraphDepModel(nn.Module):
             assignment handout.
         """
         # *#* BEGIN YOUR CODE *#* #
-        # TODO: use matmul, unsqueeze
         arc_scores = torch.einsum('bij, bjk -> bik', torch.matmul(arc_dep, self.arc_W), arc_head) +\
-                     torch.matmul(arc_head, self.arc_B)
+                     torch.matmul(arc_head, torch.unsqueeze(self.arc_B, 1))
         # *** END YOUR CODE *** #
         return arc_scores
 
@@ -222,6 +221,23 @@ class GraphDepModel(nn.Module):
             None
         """
         # *#* BEGIN YOUR CODE *#* #
+        mlp = nn.Sequential(
+            nn.Linear(self.pt_width, cfg.ARC_DIM),
+            nn.Linear(cfg.ARC_DIM, cfg.ARC_DIM),
+            nn.ReLU(),
+            nn.Dropout(cfg.DROPOUT, True))
+        self.label_h_mlp = mlp
+        self.label_d_mlp = mlp
+        self.label_W = nn.Parameter(torch.randint(
+            ((3 / cfg.ARC_DIM) ** 0.5) * -1, (3 / cfg.ARC_DIM) ** 0.5,
+            (cfg.ARC_DIM, 1, cfg.ARC_DIM)))
+        self.label_h_W = nn.Parameter(torch.randint(
+            ((3 / cfg.ARC_DIM) ** 0.5) * -1, (3 / cfg.ARC_DIM) ** 0.5,
+            (cfg.ARC_DIM, cfg.ARC_DIM)))
+        self.label_d_W = nn.Parameter(torch.randint(
+            ((3 / cfg.ARC_DIM) ** 0.5) * -1, (3 / cfg.ARC_DIM) ** 0.5,
+            (cfg.ARC_DIM, cfg.ARC_DIM)))
+        self.label_B = nn.Parameter(torch.zeros(cfg.ARC_DIM))
         # *** END YOUR CODE *** #
 
     def score_labels(self, label_head: Tensor, label_dep: Tensor) -> Tensor:
@@ -261,6 +277,10 @@ class GraphDepModel(nn.Module):
             assignment handout.
         """
         # *#* BEGIN YOUR CODE *#* #
+        label_scores = torch.einsum('bij, bjk -> bik', torch.matmul(label_dep, self.arc_W), label_head) + \
+                       torch.matmul(label_head, self.label_h_W) + \
+                       torch.matmul(label_dep, self.label_d_W) + \
+                       torch.unsqueeze(self.label_B, 1)
         # *** END YOUR CODE *** #
         return label_scores
 

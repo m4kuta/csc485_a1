@@ -2,14 +2,12 @@
 In 2n steps. Over the entire parse, n steps would be spent adding each word to the stack from the buffer at some point and another n steps would be spent removing each word out of the stack at some point.
 
 Q2(a)
-A non-projective dependency tree has a gap degree > 0, i.e. some words in the input text will have a gap degree > 0 meaning other words will be dependent on those gap words or vice versa. Those dependencies must cross the dependencies the subsequence of the given word.
+The prior algorithm is insufficient because it can only ever apply arc transitions between words in the top two positions of the stack.
 
-Non-projective dependency trees represent inputs with long-distance dependencies and free word order. These structural characteristics
+Non-projective dependency trees will have same word i with a gap degree > 0. That means there exists some word a that
+    is inbetween i and one of i's dependents j
+    has an arc to another word b such that b < min(i, j) or b > max(i, j).
 
-Given a non-project tree, we know there exists a head word at index i with a gap degree > 0. This means an arc exists between i and one of its dependent words at index j and there also exists a word at index k, where min(i, j) < k < max(i, j), that is not dependent on i. We know a path must exist from the root at index 0 to k, and k is not connected to i or any of its dependents between  so k must be connected to some word at an index < min(i, j) and/or > max(i, j). In that case a path from that word to k must cross the arc between i and j as this arc encompasses k.
+ If min(i, j) < a < max(i, j) < b, we won't be able to apply the arc transition connecting i and j until b enters the stack for us to apply the arc transition connecting a and b but that can't be done because max(i, j) would exist above a and below b in the stack. Contradiction.
 
-We know this because if k is the head of i, k, none of the other words between i and j can be the head of k because that would create a cycle. And k cannot be the dependent of any word between i and j because then it would not be a gap word.
-
-The original algorithm does not support arcs crossing each other. More specifically it does not support a word having multiple dependents in the same direction and a word existing in between those that is not a dependent of the given word. In that scenario it would have to shift all of a given heads n >= 2 dependents onto the stack before applying left or right arcs but at that point, the index of the head is already more than two places below the top of the stack.
-
-The original algorithm does nto support dependencies stemming from gap words.
+  If b < min(i, j) < a < max(i, j), we won't be able to apply the arc transition connecting a and until max(i, j) enters the stack for us to apply the arc transition connecting i and j but that can't be done because a would exist above min(i, j) and below max(i, j) in the stack. Contradiction.
