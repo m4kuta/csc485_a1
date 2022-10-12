@@ -230,7 +230,7 @@ class GraphDepModel(nn.Module):
         self.label_d_mlp = mlp
         self.label_W = nn.Parameter(torch.randint(
             ((3 / cfg.ARC_DIM) ** 0.5) * -1, (3 / cfg.ARC_DIM) ** 0.5,
-            (cfg.ARC_DIM, 1, cfg.ARC_DIM)))
+            (cfg.ARC_DIM, self._n_deprels, cfg.ARC_DIM)))
         self.label_h_W = nn.Parameter(torch.randint(
             ((3 / cfg.ARC_DIM) ** 0.5) * -1, (3 / cfg.ARC_DIM) ** 0.5,
             (cfg.ARC_DIM, cfg.ARC_DIM)))
